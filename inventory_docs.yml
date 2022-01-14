@@ -1,0 +1,77 @@
+- hosts: all
+  gather_facts: true
+  vars:
+    docs_folder: &folder "docs/inventory"
+
+    inventory_fn: "{{ inventory_file | basename }}"
+    inventory_name: "{{ inventory_fn.split('.') | first }}"
+
+    inventory_docs: "{{ docs_folder }}/{{ inventory_name }}"
+  tasks:
+    - name: ensure directory for inventory {{ inventory_fn }}
+      file:
+        path: "{{ inventory_docs }}"
+        state: directory
+      delegate_to: 127.0.0.1
+
+    - name: render the details
+      template:
+        src: "host_detail.md.j2"
+        dest: "{{ fp }}"
+      delegate_to: 127.0.0.1
+      vars:
+        fp: "{{ inventory_docs }}/{{ inventory_hostname }}.md"
+
+- hosts: localhost
+  gather_facts: false
+  vars:
+    docs_folder: *folder
+
+    inventory_fn: "{{ inventory_file | basename }}"
+    inventory_name: "{{ inventory_fn.split('.') | first }}"
+    inventory_docs: "{{ docs_folder }}/{{ inventory_name }}"
+    outfile: "{{ inventory_docs }}/index.md"
+
+    filter_group: all
+    all_hosts: "{{ groups[filter_group] | default('all') }}"
+
+    table_fields: &used_fields
+      - system_vendor
+      - processor_cores
+      - memory_mb.swap.total
+      - memtotal_mb
+      - memfree_mb
+      - distribution
+      - architecture
+      - bios_date
+
+    # Modify the labels of supp
+    custom_labels:
+      memtotal_mb: RAM [mb]
+      distribution: Distro
+
+    # Add more to your liking, dotted notation is possible
+    labels:
+      architecture: ARCH
+      bios_date: BIOS DATE
+      bios_vendor: BIOS VENDOR
+      board_vendor: BOARD VENDOR
+      distribution: OS DISTRIBUTION
+      memfree_mb: RAM FREE
+      memory_mb.swap.total: SWAP
+      memtotal_mb: RAM
+      os_family: OS FAMILY
+      processor_cores: CPU CORES
+      processor_count: CPU COUNT
+      processor_vcpus: VCPUS
+      product_name: PRODUCT NAME
+      product_serial: PRODUCT SERIAL
+      product_version: PRODUCT VERSION
+      system: SYSTEM
+      system_vendor: VENDOR
+
+  tasks:
+    - name: render the overview to {{ outfile }}
+      template:
+        src: "ansible_host_overview.md.j2"
+        dest: "{{ outfile }}"

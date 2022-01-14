@@ -1,0 +1,12 @@
+---
+
+## Details for *{{ inventory_hostname }}*
+
+**Inventory Groups**: {{ group_names | join(', ') }}
+
+{% for section, value in ansible_facts.items() %}
+### {{ section.split('_') | map('capitalize') | join(' ') }}
+```
+{{ value | to_nice_json }}
+```
+{% endfor %}
