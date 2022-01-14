@@ -18,7 +18,7 @@
 | {%- for field in all_fields %} {{ custom_labels[field] | default(labels[field] | default(field)) }} |
 {%- endfor %}
 
-|{% for field in all_fields %} {{ '-' * labels[field] | default(field) | length }} |{%- endfor %}
+|{% for field in all_fields %} {{ '-' * custom_labels[field] | default(labels[field] | default(field)) | length }} |{%- endfor %}
 
 {% for hostname in all_hosts %}
 {% set host_facts = hostvars[hostname]['ansible_facts'] %}

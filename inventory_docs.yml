@@ -5,8 +5,8 @@
 
     inventory_fn: "{{ inventory_file | basename }}"
     inventory_name: "{{ inventory_fn.split('.') | first }}"
-
     inventory_docs: "{{ docs_folder }}/{{ inventory_name }}"
+
   tasks:
     - name: ensure directory for inventory {{ inventory_fn }}
       file:
