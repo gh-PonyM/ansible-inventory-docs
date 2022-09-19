@@ -22,7 +22,7 @@
       vars:
         fp: "{{ inventory_docs }}/{{ inventory_hostname }}.md"
 
-- hosts: localhost
+- hosts: all
   gather_facts: false
   vars:
     docs_folder: *folder
@@ -71,7 +71,8 @@
       system_vendor: VENDOR
 
   tasks:
-    - name: render the overview to {{ outfile }}
+    - name: render the overview
       template:
         src: "ansible_host_overview.md.j2"
         dest: "{{ outfile }}"
+      when: ansible_connection == 'local'
